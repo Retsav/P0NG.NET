@@ -9,13 +9,11 @@ public class PlayerNetwork : NetworkBehaviour
 {
     private NetworkVariable<int> randomNumber = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [SerializeField] private LayerMask barsLayerMask;
+    [SerializeField] private List<Vector3> spawnPoints;
+
     public override void OnNetworkSpawn()
     {
-        randomNumber.OnValueChanged += (int previousValue, int newValue) =>
-        {
-            Debug.Log(OwnerClientId + "; " + randomNumber.Value);
-        };
-        base.OnNetworkSpawn();
+        transform.position = spawnPoints[(int)OwnerClientId];
     }
 
     private void Update()
@@ -36,11 +34,5 @@ public class PlayerNetwork : NetworkBehaviour
         {
             transform.position += moveDir * (moveSpeed * Time.deltaTime);   
         }
-    }
-
-    [ServerRpc]
-    private void TestServerRpc()
-    {
-        
     }
 }
