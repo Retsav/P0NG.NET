@@ -16,6 +16,19 @@ public class BallServer : NetworkBehaviour
     
     public override void OnNetworkSpawn()
     {
+        GameStatesSystem.entryState.OnStateChanged += GameStatesSystem_EntryOrIntermissionState_OnStateChanged;
+        GameStatesSystem.intermissionState.OnStateChanged += GameStatesSystem_EntryOrIntermissionState_OnStateChanged;
+        ScoreBar.OnAnyBarHit += ScoreBar_OnAnyBarHit;
+    }
+
+    private void ScoreBar_OnAnyBarHit(object sender, EventArgs e)
+    {
+        transform.position = Vector3.zero;
+        rb.velocity = Vector2.zero;
+    }
+
+    private void GameStatesSystem_EntryOrIntermissionState_OnStateChanged(object sender, EventArgs e)
+    {
         if (IsServer)
         {
             AddStartingForce();   
