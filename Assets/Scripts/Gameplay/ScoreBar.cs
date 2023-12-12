@@ -11,8 +11,7 @@ public class ScoreBar : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (!IsServer) return;
-        Debug.Log("PONG");
+        if (!IsServer) return; ;
         OnAnyBarHitEventClientRpc();
         barScore.Value++;
     }

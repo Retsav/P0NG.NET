@@ -11,4 +11,9 @@ public class GameplayState : IGameState
     {
         return GameStatesSystem.gameplayState;
     }
+
+    public int GetStateIndex()
+    {
+        return 1;
+    }
 }
