@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameStatesSystem : NetworkBehaviour
 {
@@ -30,7 +31,14 @@ public class GameStatesSystem : NetworkBehaviour
         stateTime.OnValueChanged += stateTime_OnValueChanged;
         entryState.OnStateChanged += States_OnStateChangedResetText;
         intermissionState.OnStateChanged += States_OnStateChangedResetText;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectedCallback; 
         ScoreBar.OnAnyBarHit += ScoreBar_OnAnyBarHit;
+    }
+
+    private void NetworkManager_OnClientDisconnectedCallback(ulong obj)
+    {
+        Debug.Log("PLAYER DISCONNECTED!");
+        SceneManager.LoadScene("DisconnectScene", LoadSceneMode.Additive);
     }
 
     private void ScoreBar_OnAnyBarHit(object sender, EventArgs e)
