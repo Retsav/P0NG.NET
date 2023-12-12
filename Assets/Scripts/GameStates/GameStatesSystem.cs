@@ -8,9 +8,14 @@ using UnityEngine;
 public class GameStatesSystem : NetworkBehaviour
 {
     [SerializeField] private TextMeshProUGUI timerCounterText;
+
+
+
+    
     public static EntryState entryState = new EntryState();
     public static GameplayState gameplayState = new GameplayState();
     public static IntermissionState intermissionState = new IntermissionState();
+
 
     private static IGameState currentState;
     
@@ -18,6 +23,7 @@ public class GameStatesSystem : NetworkBehaviour
     private const int ENTRY_STATE_TIMER_MAX = 3;
     private const int INTERMISSION_STATE_TIMER_MAX = 2;
 
+    
     public override void OnNetworkSpawn()
     {
         currentState = entryState;
@@ -30,13 +36,13 @@ public class GameStatesSystem : NetworkBehaviour
     private void ScoreBar_OnAnyBarHit(object sender, EventArgs e)
     {
         if (!IsServer) return;
-        stateTime.Value = INTERMISSION_STATE_TIMER_MAX;
         UpdateStateMachineToIntermissionServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void UpdateStateMachineToIntermissionServerRpc()
     {
+        Debug.Log("SERVER: SEND INTERMISSION");
         UpdateStateMachineToIntermissionClientRpc();
     }
     
@@ -44,10 +50,18 @@ public class GameStatesSystem : NetworkBehaviour
     [ClientRpc]
     private void UpdateStateMachineToIntermissionClientRpc()
     {
-        Debug.Log("INTERMISSION!");
+        Debug.Log("CLIENT: GET INTERMISSION!");
         currentState = intermissionState;
+        if(currentState != intermissionState) Debug.LogError("Current state is not intermission state"); 
+        UpdateStateTimerServerRpc(INTERMISSION_STATE_TIMER_MAX);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateStateTimerServerRpc(float value)
+    {
+        stateTime.Value = value;
+    }
+    
     private void States_OnStateChangedResetText(object sender, EventArgs e)
     {
         States_OnStateChangedResetTextClientRpc();
@@ -67,15 +81,32 @@ public class GameStatesSystem : NetworkBehaviour
 
     private void Update()
     {
-        Debug.Log("State " + currentState + " : " + stateTime);
-        if(IsServer) UpdateStateMachineClientRpc();
+        if (!IsServer) return; 
+        currentState = currentState.DoState(this);
+        UpdateStateMachineClientRpc(currentState.GetStateIndex());
     }
 
     [ClientRpc]
-    private void UpdateStateMachineClientRpc()
+    private void UpdateStateMachineClientRpc(int stateIndex)
     {
-        currentState = currentState.DoState(this);
+        switch (stateIndex)
+        {
+            case 0:
+                currentState = entryState;
+                break;
+            case 1:
+                currentState = gameplayState;
+                timerCounterText.text = "";
+                break;
+            case 2:
+                currentState = intermissionState;
+                break;
+            default:
+                Debug.LogError("Wrong stateIndex!");
+                break;
+        }
     }
+    
 
     public static IGameState GetCurrentState()
     {
@@ -92,4 +123,6 @@ public class GameStatesSystem : NetworkBehaviour
     {
         return stateTime.Value;
     }
+    
+    
 }

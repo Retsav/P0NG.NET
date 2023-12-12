@@ -26,9 +26,8 @@ public class PlayerNetworkCounter : MonoBehaviour
     {
         if (playerCounter >= 1)
         {
-            Debug.Log("Second player connected...");
             Task loadTask = FakeLoadTimeAsync();
-            waitingText.text = "PLAYER FOUND! STARTING...";
+            waitingText.text = "PLAYER FOUND! LOADING MATCH...";
             await loadTask;
             LoadGameScene();
         }
@@ -37,7 +36,6 @@ public class PlayerNetworkCounter : MonoBehaviour
     private async Task FakeLoadTimeAsync()
     {
         await Task.Delay(5000);
-        Debug.Log("STARTED!");
     }
 
     private void LoadGameScene()

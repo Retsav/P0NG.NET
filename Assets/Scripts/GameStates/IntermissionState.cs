@@ -19,9 +19,15 @@ public class IntermissionState : IGameState
         return GameStatesSystem.gameplayState;
     }
 
+    public int GetStateIndex()
+    {
+        return 2;
+    }
+
     [ClientRpc]
     private void SendEventOnStateChangedClientRpc()
     {
+        Debug.Log("INTERMISSION END EVENT SEND");
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 }

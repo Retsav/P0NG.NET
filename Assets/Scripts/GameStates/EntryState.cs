@@ -17,7 +17,12 @@ public class EntryState : IGameState
         SendEventOnStateChangedClientRpc();
         return GameStatesSystem.gameplayState;
     }
-    
+
+    public int GetStateIndex()
+    {
+        return 0;
+    }
+
     private void SendEventOnStateChangedClientRpc()
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
